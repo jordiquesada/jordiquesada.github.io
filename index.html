@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jordi Quesada Balaguer — Bases de dades 360°</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy: #0b0f1a; --navy2: #111827; --navy3: #1a2236; --navy4: #243049;
+    --teal: #0ea5e9; --teal-dim: #0284c7;
+    --amber: #f59e0b; --amber-dim: #d97706;
+    --text: #e2e8f0; --text-muted: #94a3b8; --text-faint: #475569;
+    --border: rgba(255,255,255,0.07); --border-bright: rgba(255,255,255,0.14);
+    --serif: 'DM Serif Display', Georgia, serif;
+    --sans: 'IBM Plex Sans', system-ui, sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+  html { scroll-behavior: smooth; }
+  body { background: var(--navy); color: var(--text); font-family: var(--sans); font-size: 16px; line-height: 1.7; -webkit-font-smoothing: antialiased; }
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(11,15,26,0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 56px; gap: 1rem; }
+  .nav-logo { font-family: var(--mono); font-size: 13px; color: var(--teal); letter-spacing: 0.04em; flex-shrink: 0; }
+  .nav-links { display: flex; gap: 1.6rem; list-style: none; }
+  .nav-links a { font-size: 13px; color: var(--text-muted); text-decoration: none; letter-spacing: 0.03em; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--text); }
+  .lang-switcher { display: flex; gap: 4px; flex-shrink: 0; }
+  .lang-btn { background: transparent; border: 1px solid var(--border-bright); color: var(--text-faint); font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; padding: 3px 8px; border-radius: 3px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 4px; }
+  .lang-btn {
+  padding: 2px;
+  border: none;
+  background: transparent;
+}
+
+.lang-flag {
+  width: 24px;
+  height: 16px;
+  border-radius: 2px;
+  transition: transform .2s;
+}
+
+.lang-btn:hover .lang-flag {
+  transform: scale(1.1);
+}
+  .lang-btn:hover { border-color: var(--teal); color: var(--text); }
+  .lang-btn.active { border-color: var(--teal); color: var(--teal); background: rgba(14,165,233,0.08); }
+  .lang-flag { font-size: 13px; line-height: 1; }
+  section { padding: 6rem 2rem; max-width: 1080px; margin: 0 auto; }
+  .section-tag { font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; color: var(--teal); text-transform: uppercase; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.6rem; }
+  .section-tag::before { content: ''; display: block; width: 20px; height: 1px; background: var(--teal); }
+  h2.section-title { font-family: var(--serif); font-size: clamp(2rem, 4vw, 3rem); font-weight: 400; line-height: 1.15; color: var(--text); margin-bottom: 1rem; }
+  .section-lead { font-size: 1.05rem; color: var(--text-muted); max-width: 640px; line-height: 1.8; }
+  .divider { width: 100%; height: 1px; background: linear-gradient(90deg, transparent, var(--border-bright), transparent); }
+  #hero { min-height: 100vh; padding-top: 8rem; padding-bottom: 4rem; display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; }
+  .hero-grid-bg { position: absolute; inset: 0; z-index: 0; background-image: linear-gradient(rgba(14,165,233,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(14,165,233,0.04) 1px, transparent 1px); background-size: 48px 48px; mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, black 30%, transparent 100%); }
+  .hero-glow { position: absolute; width: 600px; height: 400px; background: radial-gradient(ellipse, rgba(14,165,233,0.08) 0%, transparent 70%); top: 10%; left: -10%; z-index: 0; pointer-events: none; }
+  .hero-content { position: relative; z-index: 1; }
+  .hero-eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; color: var(--teal); text-transform: uppercase; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.8rem; }
+  .hero-eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--teal); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+  h1.hero-name { font-family: var(--serif); font-size: clamp(3rem, 7vw, 5.5rem); font-weight: 400; line-height: 1.05; color: var(--text); margin-bottom: 0.3rem; }
+  .hero-name em { font-style: italic; color: var(--teal); }
+  .hero-subtitle { font-family: var(--sans); font-size: 1rem; font-weight: 300; color: var(--text-muted); letter-spacing: 0.06em; margin-bottom: 2.5rem; text-transform: uppercase; }
+  .hero-desc { font-size: 1.15rem; color: var(--text-muted); max-width: 580px; line-height: 1.8; margin-bottom: 3rem; }
+  .hero-ctas { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .btn-primary { background: var(--teal); color: #fff; border: none; padding: 0.75rem 1.75rem; font-family: var(--sans); font-size: 14px; font-weight: 500; border-radius: 4px; cursor: pointer; text-decoration: none; transition: background 0.2s, transform 0.15s; letter-spacing: 0.02em; }
+  .btn-primary:hover { background: var(--teal-dim); transform: translateY(-1px); }
+  .btn-secondary { background: transparent; color: var(--text); border: 1px solid var(--border-bright); padding: 0.75rem 1.75rem; font-family: var(--sans); font-size: 14px; font-weight: 400; border-radius: 4px; cursor: pointer; text-decoration: none; transition: border-color 0.2s, transform 0.15s; }
+  .btn-secondary:hover { border-color: var(--teal); color: var(--teal); transform: translateY(-1px); }
+  .autor-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 4rem; align-items: start; margin-top: 3.5rem; }
+  .autor-photo-wrap { position: sticky; top: 80px; }
+  .autor-photo { width: 100%; aspect-ratio: 3/4; border-radius: 6px; background: var(--navy3); border: 1px solid var(--border-bright); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem; overflow: hidden; }
+  .autor-bio p { color: var(--text-muted); margin-bottom: 1.2rem; line-height: 1.9; }
+  .autor-bio p:first-child { font-size: 1.05rem; }
+  .autor-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 2.5rem; }
+  .stat-card { background: var(--navy3); border: 1px solid var(--border); border-radius: 6px; padding: 1.2rem 1rem; text-align: center; }
+  .stat-number { font-family: var(--serif); font-size: 2.2rem; color: var(--amber); display: block; }
+  .stat-label { font-size: 11px; color: var(--text-muted); letter-spacing: 0.06em; text-transform: uppercase; font-family: var(--mono); }
+  .timeline { margin-top: 3.5rem; position: relative; }
+  .timeline::before { content: ''; position: absolute; left: 11px; top: 8px; bottom: 0; width: 1px; background: var(--border-bright); }
+  .tl-item { display: flex; gap: 2rem; margin-bottom: 2.5rem; position: relative; }
+  .tl-dot { width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0; border: 1px solid var(--text-faint); background: var(--navy); display: flex; align-items: center; justify-content: center; margin-top: 2px; transition: border-color 0.4s, box-shadow 0.4s; }
+  .tl-dot-inner { width: 8px; height: 8px; border-radius: 50%; background: var(--text-faint); transition: background 0.4s, transform 0.4s; }
+  .tl-dot.amber { border-color: var(--text-faint); }
+  .tl-dot.amber .tl-dot-inner { background: var(--text-faint); }
+  .tl-item.tl-active .tl-dot { border-color: var(--teal); box-shadow: 0 0 0 5px rgba(14,165,233,0.18); }
+  .tl-item.tl-active .tl-dot.amber { border-color: var(--amber); box-shadow: 0 0 0 5px rgba(245,158,11,0.18); }
+  .tl-item.tl-active .tl-dot-inner { background: var(--teal); transform: scale(1.3); }
+  .tl-item.tl-active .tl-dot.amber .tl-dot-inner { background: var(--amber); }
+  .tl-year { font-family: var(--mono); font-size: 11px; color: var(--teal); letter-spacing: 0.08em; margin-bottom: 0.3rem; }
+  .tl-year.amber { color: var(--amber); }
+  .tl-year.dim { color: var(--text-faint); }
+  .tl-title { font-size: 1rem; font-weight: 500; color: var(--text); margin-bottom: 0.3rem; }
+  .tl-desc { font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; }
+  .repo-box { margin-top: 2rem; display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; background: var(--navy3); border: 1px solid rgba(14,165,233,0.25); border-left: 3px solid var(--teal); border-radius: 6px; padding: 1.2rem 1.5rem; }
+  .repo-icon { color: var(--teal); flex-shrink: 0; }
+  .repo-text { flex: 1; min-width: 180px; }
+  .repo-title { font-weight: 500; font-size: 0.95rem; color: var(--text); margin-bottom: 0.2rem; }
+  .repo-desc { font-size: 0.85rem; color: var(--text-muted); }
+  .repo-link { font-family: var(--mono); font-size: 13px; color: var(--teal); text-decoration: none; white-space: nowrap; border: 1px solid rgba(14,165,233,0.3); border-radius: 4px; padding: 0.4rem 0.9rem; transition: background 0.2s; }
+  .repo-link:hover { background: rgba(14,165,233,0.1); }
+  .book-card { margin-top: 3.5rem; background: var(--navy3); border: 1px solid var(--border-bright); border-radius: 8px; padding: 2.5rem; display: grid; grid-template-columns: auto 1fr; gap: 3rem; align-items: start; }
+  .book-cover { width: 180px; background: var(--navy4); aspect-ratio: 2/3; border-radius: 4px; border: 1px solid var(--border-bright); display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 1.5rem 1rem; position: relative; overflow: hidden; }
+  .book-cover::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(14,165,233,0.15) 0%, transparent 60%); }
+  .book-cover-tag { font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; color: var(--teal); text-transform: uppercase; z-index: 1; }
+  .book-cover-title { font-family: var(--serif); font-size: 1.1rem; color: var(--text); text-align: center; line-height: 1.3; z-index: 1; }
+  .book-cover-accent { width: 40px; height: 2px; background: var(--amber); z-index: 1; margin: 0.5rem 0; }
+  .book-cover-sub { font-family: var(--mono); font-size: 8px; color: var(--text-muted); text-align: center; z-index: 1; letter-spacing: 0.06em; }
+  .book-cover-author { font-family: var(--sans); font-size: 9px; color: var(--text-muted); text-align: center; z-index: 1; letter-spacing: 0.04em; }
+  .book-title-display { font-family: var(--serif); font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 400; line-height: 1.2; color: var(--text); margin-bottom: 0.5rem; }
+  .book-title-display em { font-style: italic; color: var(--amber); }
+  .book-badge { display: inline-block; font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; background: rgba(245,158,11,0.1); color: var(--amber); border: 1px solid rgba(245,158,11,0.3); padding: 3px 10px; border-radius: 3px; margin-bottom: 1.5rem; }
+  .book-desc { color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.8; }
+  .book-audience { background: var(--navy2); border: 1px solid var(--border); border-radius: 6px; padding: 1rem 1.2rem; font-size: 0.9rem; color: var(--text-muted); }
+  .book-audience strong { color: var(--teal); font-weight: 500; }
+  .parts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.2rem; margin-top: 3.5rem; }
+  .part-card { background: var(--navy3); border: 1px solid var(--border); border-radius: 6px; padding: 1.5rem; transition: border-color 0.2s, transform 0.2s; }
+  .part-card:hover { border-color: var(--border-bright); transform: translateY(-2px); }
+  .part-card.highlight { border-color: rgba(14,165,233,0.3); }
+  .part-num { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; color: var(--text-faint); text-transform: uppercase; margin-bottom: 0.8rem; }
+  .part-name { font-family: var(--serif); font-size: 1.15rem; color: var(--text); margin-bottom: 1rem; line-height: 1.3; }
+  .part-topics { list-style: none; }
+  .part-topics li { font-size: 0.85rem; color: var(--text-muted); padding: 0.3rem 0; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 0.5rem; }
+  .part-topics li:last-child { border-bottom: none; }
+  .part-topics li::before { content: ''; width: 4px; height: 4px; border-radius: 50%; background: var(--teal); flex-shrink: 0; }
+  .part-card.amber-accent .part-topics li::before { background: var(--amber); }
+  .tech-circle-section { display: flex; flex-direction: column; align-items: center; margin-top: 3rem; }
+  .tech-circle-wrap { position: relative; width: 680px; height: 680px; flex-shrink: 0; }
+  .tech-track { position: absolute; inset: 80px; border-radius: 50%; border: 1px solid rgba(14,165,233,0.18); }
+  .tech-glow-dot { position: absolute; width: 14px; height: 14px; border-radius: 50%; background: var(--teal); box-shadow: 0 0 14px 5px rgba(14,165,233,0.55); transform: translate(-50%, -50%); transition: left 0.6s cubic-bezier(0.4,0,0.2,1), top 0.6s cubic-bezier(0.4,0,0.2,1); z-index: 2; pointer-events: none; }
+  .tech-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; z-index: 1; }
+  .tech-center-num { font-family: var(--serif); font-size: 3rem; color: var(--teal); line-height: 1; display: block; }
+  .tech-center-sub { font-family: var(--mono); font-size: 10px; color: var(--text-faint); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 0.4rem; display: block; line-height: 1.6; }
+  .tech-item { position: absolute; font-family: var(--mono); font-size: 12px; color: var(--text-muted); background: var(--navy3); border: 1px solid var(--border-bright); border-radius: 4px; padding: 0.35rem 0.75rem; white-space: nowrap; z-index: 3; cursor: default; }
+  @media (max-width: 720px) { .tech-circle-wrap { transform: scale(0.58); transform-origin: top center; margin-bottom: -285px; } }
+  @media (max-width: 440px) { .tech-circle-wrap { transform: scale(0.42); margin-bottom: -395px; } }
+  .contact-two-col { margin-top: 3.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; }
+  @media (max-width: 860px) { .contact-two-col { grid-template-columns: 1fr; gap: 3rem; } }
+  .contact-col-title { font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; color: var(--teal); text-transform: uppercase; margin-bottom: 0.6rem; display: flex; align-items: center; gap: 0.6rem; }
+  .contact-col-title::before { content: ''; display: block; width: 16px; height: 1px; background: var(--teal); }
+  .contact-col h3 { font-family: var(--serif); font-size: 1.6rem; font-weight: 400; color: var(--text); margin-bottom: 0.6rem; line-height: 1.2; }
+  .contact-col p { font-size: 0.92rem; color: var(--text-muted); line-height: 1.75; margin-bottom: 1.6rem; }
+  .contact-form { display: flex; flex-direction: column; gap: 1rem; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+  .form-group label { font-size: 12px; font-family: var(--mono); letter-spacing: 0.06em; color: var(--text-muted); text-transform: uppercase; }
+  .form-group input, .form-group textarea { background: var(--navy3); border: 1px solid var(--border-bright); border-radius: 4px; padding: 0.65rem 0.9rem; color: var(--text); font-family: var(--sans); font-size: 0.9rem; outline: none; resize: vertical; transition: border-color 0.2s; }
+  .form-group input::placeholder, .form-group textarea::placeholder { color: var(--text-faint); }
+  .form-group input:focus, .form-group textarea:focus { border-color: var(--teal); }
+  .cf-feedback { margin-top: 0.5rem; font-size: 0.9rem; padding: 0.7rem 1rem; border-radius: 4px; }
+  .cf-feedback.ok { background: rgba(34,197,94,0.1); color: #4ade80; border: 1px solid rgba(34,197,94,0.2); }
+  .cf-feedback.err { background: rgba(239,68,68,0.1); color: #f87171; border: 1px solid rgba(239,68,68,0.2); }
+  @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+  .social-cards { display: flex; flex-direction: column; gap: 1rem; }
+  .social-card { display: flex; align-items: center; gap: 1rem; background: var(--navy3); border: 1px solid var(--border-bright); border-radius: 8px; padding: 1.2rem 1.4rem; text-decoration: none; color: var(--text); transition: border-color 0.2s, transform 0.2s; }
+  .social-card:hover { transform: translateY(-2px); }
+  .social-card.linkedin:hover { border-color: #0a66c2; }
+  .social-card.github:hover  { border-color: var(--teal); }
+  .social-card-icon { width: 46px; height: 46px; border-radius: 10px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+  .linkedin-color { background: rgba(10,102,194,0.15); color: #0a66c2; }
+  .github-color  { background: rgba(14,165,233,0.12); color: var(--teal); }
+  .social-card-text { flex: 1; }
+  .social-card-name { font-weight: 500; font-size: 0.95rem; color: var(--text); margin-bottom: 0.15rem; }
+  .social-card-handle { font-family: var(--mono); font-size: 0.8rem; color: var(--text-muted); }
+  .social-card-arrow { color: var(--text-faint); flex-shrink: 0; }
+  footer { border-top: 1px solid var(--border); padding: 2rem; text-align: center; font-family: var(--mono); font-size: 11px; color: var(--text-faint); letter-spacing: 0.05em; }
+  /* Hamburger button */
+  .nav-hamburger { display: none; flex-direction: column; justify-content: center; gap: 5px; background: transparent; border: none; cursor: pointer; padding: 6px; z-index: 200; }
+  .nav-hamburger span { display: block; width: 22px; height: 2px; background: var(--text-muted); border-radius: 2px; transition: all 0.3s ease; transform-origin: center; }
+  .nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); background: var(--teal); }
+  .nav-hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  .nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); background: var(--teal); }
+
+  /* Mobile menu overlay */
+  .mobile-menu { display: none; position: fixed; top: 56px; left: 0; right: 0; bottom: 0; z-index: 99; background: rgba(11,15,26,0.97); backdrop-filter: blur(16px); flex-direction: column; align-items: center; justify-content: center; gap: 0; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; }
+  .mobile-menu.open { opacity: 1; pointer-events: all; }
+  .mobile-menu ul { list-style: none; display: flex; flex-direction: column; align-items: center; gap: 0; width: 100%; }
+  .mobile-menu ul li { width: 100%; border-bottom: 1px solid var(--border); }
+  .mobile-menu ul li:first-child { border-top: 1px solid var(--border); }
+  .mobile-menu ul a { display: block; text-align: center; padding: 1.2rem 2rem; font-size: 1rem; color: var(--text-muted); text-decoration: none; letter-spacing: 0.04em; transition: color 0.2s, background 0.2s; }
+  .mobile-menu ul a:hover, .mobile-menu ul a:active { color: var(--teal); background: rgba(14,165,233,0.06); }
+  .mobile-menu-lang { display: flex; gap: 10px; margin-top: 2.5rem; }
+
+  @media (max-width: 768px) {
+    .nav-links { display: none; }
+    .nav-hamburger { display: flex; }
+    .mobile-menu { display: flex; }
+    .autor-grid { grid-template-columns: 1fr; }
+    .autor-photo-wrap { position: static; }
+    .autor-photo { aspect-ratio: 1/1; max-width: 220px; margin: 0 auto; }
+    .book-card { grid-template-columns: 1fr; }
+    .book-cover { width: 140px; margin: 0 auto; }
+    .autor-stats { grid-template-columns: repeat(3,1fr); }
+  }
+</style>
+<link rel="icon" type="image/png" href="./img/favicon.png">
+</head>
+<body>
+
+<nav>
+  <span class="nav-logo">Jordi Quesada</span>
+  <ul class="nav-links">
+    <li><a href="#hero"        data-i18n="nav_inici">Inici</a></li>
+    <li><a href="#autor"       data-i18n="nav_autor">Autor</a></li>
+    <li><a href="#trajectoria" data-i18n="nav_trajectoria">Trajectoria</a></li>
+    <li><a href="#llibre"      data-i18n="nav_llibre">El llibre</a></li>
+    <li><a href="#continguts"  data-i18n="nav_continguts">Continguts</a></li>
+    <li><a href="#tecnologies" data-i18n="nav_tecnologies">Tecnologies</a></li>
+    <li><a href="#contacte"    data-i18n="nav_contacte">Contacte</a></li>
+  </ul>
+  <div class="lang-switcher">
+    <button class="lang-btn active" data-lang="ca"><img src="./img/cat.png" alt="Català" class="lang-flag"></button>
+    <button class="lang-btn"        data-lang="es"><img src="./img/es.png" alt="Español" class="lang-flag"></button>
+    <button class="lang-btn"        data-lang="en"><img src="./img/en.png" alt="English" class="lang-flag"></button>
+  </div>
+  <button class="nav-hamburger" id="navHamburger" aria-label="Menú" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- Mobile menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <ul>
+    <li><a href="#hero"        data-i18n="nav_inici"       class="mobile-nav-link">Inici</a></li>
+    <li><a href="#autor"       data-i18n="nav_autor"       class="mobile-nav-link">Autor</a></li>
+    <li><a href="#trajectoria" data-i18n="nav_trajectoria" class="mobile-nav-link">Trajectoria</a></li>
+    <li><a href="#llibre"      data-i18n="nav_llibre"      class="mobile-nav-link">El llibre</a></li>
+    <li><a href="#continguts"  data-i18n="nav_continguts"  class="mobile-nav-link">Continguts</a></li>
+    <li><a href="#tecnologies" data-i18n="nav_tecnologies" class="mobile-nav-link">Tecnologies</a></li>
+    <li><a href="#contacte"    data-i18n="nav_contacte"    class="mobile-nav-link">Contacte</a></li>
+  </ul>
+  <div class="mobile-menu-lang">
+    <button class="lang-btn active" data-lang="ca"><img src="./img/cat.png" alt="Català" class="lang-flag"></button>
+    <button class="lang-btn"        data-lang="es"><img src="./img/es.png" alt="Español" class="lang-flag"></button>
+    <button class="lang-btn"        data-lang="en"><img src="./img/en.png" alt="English" class="lang-flag"></button>
+  </div>
+</div>
+
+<section id="hero" style="max-width:1080px;">
+  <div class="hero-grid-bg"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow"><span class="dot"></span><span data-i18n="hero_eyebrow">Enginyer · Professor · Autor</span></div>
+    <h1 class="hero-name">Jordi<br><em>Quesada</em><br>Balaguer</h1>
+    <p class="hero-subtitle" data-i18n="hero_subtitle">Bases de dades · Docencia · Barcelona</p>
+    <p class="hero-desc" data-i18n-html="hero_desc">Desprès de mes de 20 anys a l'aula, he escrit un llibre pensat especialment per als meus alumnes de cicles formatius.<br><em>Bases de dades 360°: del disseny al NoSQL</em>, un llibre pensat des de l'aula i per a l'aula.</p>
+    <div class="hero-ctas">
+      <a href="#llibre" class="btn-primary"   data-i18n="hero_btn1">Descobrir el llibre</a>
+      <a href="#autor"  class="btn-secondary" data-i18n="hero_btn2">Sobre l'autor</a>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section id="autor">
+  <div class="section-tag" data-i18n="nav_autor">Autor</div>
+  <h2 class="section-title" data-i18n="autor_title">Quí soc?</h2>
+  <div class="autor-grid">
+    <div class="autor-photo-wrap">
+      <div class="autor-photo">
+        <img src="./img/me.png" alt="Jordi Quesada" style="width:100%;height:100%;object-fit:cover;border-radius:6px;">
+      </div>
+    </div>
+    <div class="autor-bio">
+      <p data-i18n="autor_bio1">Soc enginyer informatec per la Facultat d'Informatica de Barcelona (FIB). Abans de dedicar-me a la docencia, vaig treballar com a programador i analista programador en una consultora informatica.</p>
+      <p data-i18n="autor_bio2">Des del 2002 soc professor al Departament d'Educació i Formació Professional de la Generalitat de Catalunya, i fa mes d'una decada que explico bases de dades a l'Institut TIC de Barcelona. En aquests anys tambe he estat tutor i cap del departament d'informatica.</p>
+      <p data-i18n="autor_bio3">Visc a Barcelona amb la meva familia, que es, amb diferencia, el millor de la meva vida.</p>
+      <div class="autor-stats">
+        <div class="stat-card">
+          <span class="stat-number" id="counter-1" data-target="22" data-prefix="+">+0</span>
+          <span class="stat-label" data-i18n="stat1_label">Anys docent</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-number" id="counter-2" data-target="10" data-prefix="+">+0</span>
+          <span class="stat-label" data-i18n="stat2_label">Anys BBDD</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-number" id="counter-3" data-target="4" data-prefix="">0</span>
+          <span class="stat-label" data-i18n="stat3_label">Motors BBDD</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section id="trajectoria">
+  <div class="section-tag" data-i18n="nav_trajectoria">Trajectoria</div>
+  <h2 class="section-title" data-i18n="traj_title">Un cami des del codi fins a l'aula</h2>
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-dot dim"><div class="tl-dot-inner"></div></div>
+      <div class="tl-body">
+        <div class="tl-year dim" data-i18n="tl1_year">Etapa professional</div>
+        <div class="tl-title" data-i18n="tl1_title">Programador i Analista Programador</div>
+        <div class="tl-desc" data-i18n="tl1_desc">Consultora informatica. Primera etapa al mon laboral, treballant amb projectes de datamining i datawarehousing.</div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+      <div class="tl-body">
+        <div class="tl-year">2002</div>
+        <div class="tl-title" data-i18n="tl2_title">Inici de la docencia - Departament d'Educació i Formació Professional, Generalitat de Catalunya</div>
+        <div class="tl-desc" data-i18n="tl2_desc">Comenzo a impartir classes d'informatica als cicles formatius de grau superior, combinant sistemes operatius, programacio web i bases de dades.</div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+      <div class="tl-body">
+        <div class="tl-year" data-i18n="tl3_year">Instituts Carles Vallbona - Rambla Prim - Joan d'Austria</div>
+        <div class="tl-title" data-i18n="tl3_title">Professor, tutor i cap de departament</div>
+        <div class="tl-desc" data-i18n="tl3_desc">Anys de consolidacio docent. A mes de l'activitat lectiva, algun any he pogut ser tutor d'alumnes i cap del departament d'informatica.</div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+      <div class="tl-body">
+        <div class="tl-year" data-i18n="tl4_year">Ultims 10 anys</div>
+        <div class="tl-title" data-i18n="tl4_title">Especialitzacio en Bases de Dades</div>
+        <div class="tl-desc" data-i18n="tl4_desc">Els ultims anys he pogut impartir el modul de Bases de dades als cicles de DAM i DAW, centrant-me especialment en MySQL, PostgreSQL, Oracle i MongoDB.</div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot amber"><div class="tl-dot-inner"></div></div>
+      <div class="tl-body">
+        <div class="tl-year amber" data-i18n="tl5_year">Actualitat - Institut TIC de Barcelona</div>
+        <div class="tl-title" data-i18n="tl5_title">Professor de Bases de Dades - Autor</div>
+        <div class="tl-desc" data-i18n-html="tl5_desc">Segueixo impartint el modul de Bases de dades i els ultims mesos he pogut entrar en el projecte de creacio del llibre <em>Bases de dades 360°: del disseny al NoSQL</em>.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section id="llibre">
+  <div class="section-tag" data-i18n="nav_llibre">El llibre</div>
+  <h2 class="section-title" data-i18n="llibre_title">Del disseny al NoSQL, sense deixar res pel cami</h2>
+  <div class="book-card">
+    <div class="book-cover">
+      <span class="book-cover-tag">BBDD 360°</span>
+      <div style="text-align:center;z-index:1;">
+        <div class="book-cover-title">Bases de dades 360°</div>
+        <div class="book-cover-accent" style="margin:0.8rem auto;"></div>
+        <div class="book-cover-sub">del disseny al NoSQL</div>
+      </div>
+      <span class="book-cover-author">Jordi Quesada Balaguer</span>
+    </div>
+    <div class="book-info">
+      <h3 class="book-title-display">Bases de dades 360°:<br><em>del disseny al NoSQL</em></h3>
+      <span class="book-badge" data-i18n="llibre_badge">Proximament</span>
+      <p class="book-desc" data-i18n="llibre_desc1">Un recurs complet que acompanya l'alumne des dels fonaments del disseny de bases de dades fins a les tecnologies NoSQL actuals.</p>
+      <p class="book-desc" data-i18n="llibre_desc2">Escrit amb la intencio que tots els alumnes puguin arribar fins al final amb confianca i amb ganes de mes.</p>
+      <div class="book-audience">
+        <strong data-i18n="llibre_audience_label">A qui va dirigit:</strong>
+        <span data-i18n="llibre_audience_text">Alumnes de cicles formatius de grau superior d'informatica, estudiants autodidactes i docents que busquen un material estructurat i complet.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section id="continguts">
+  <div class="section-tag" data-i18n="nav_continguts">Continguts</div>
+  <h2 class="section-title" data-i18n="continguts_title">Estructura del llibre</h2>
+  <p class="section-lead" data-i18n="continguts_lead">Sis blocs i catorze capitols que cobreixen el cicle complet d'una base de dades.</p>
+  <div class="parts-grid">
+    <div class="part-card highlight">
+      <div class="part-num">Bloc 01 · Cap. 1-4</div>
+      <div class="part-name" data-i18n="bloc1_name">Pensar abans d'actuar</div>
+      <ul class="part-topics" data-i18n-html="bloc1_topics"><li>Per que existeixen les BBDD relacionals</li><li>Model Entitat-Relacio</li><li>Transformacio al model relacional</li><li>Normalitzacio (1FN, 2FN, 3FN, FNBC)</li></ul>
+    </div>
+    <div class="part-card">
+      <div class="part-num">Bloc 02 · Cap. 5</div>
+      <div class="part-name" data-i18n="bloc2_name">DDL: definir l'estructura</div>
+      <ul class="part-topics" data-i18n-html="bloc2_topics"><li>Disseny fisic de taules</li><li>Tipus de dades i restriccions</li><li>Modificacio d'esquemes</li></ul>
+    </div>
+    <div class="part-card">
+      <div class="part-num">Bloc 03 · Cap. 6</div>
+      <div class="part-name" data-i18n="bloc3_name">DML: operacions fonamentals</div>
+      <ul class="part-topics" data-i18n-html="bloc3_topics"><li>INSERT, UPDATE, DELETE</li><li>Consultes amb filtratge i ordenacio</li><li>Expressions regulars</li><li>Funcions integrades</li></ul>
+    </div>
+    <div class="part-card">
+      <div class="part-num">Bloc 04 · Cap. 7-10</div>
+      <div class="part-name" data-i18n="bloc4_name">DML: consultes avancades</div>
+      <ul class="part-topics" data-i18n-html="bloc4_topics"><li>Agregacio, agrupacio i joins</li><li>Indexos i plans d'execucio (EXPLAIN)</li><li>Transaccions i propietats ACID</li><li>Vistes i diccionari de dades</li></ul>
+    </div>
+    <div class="part-card">
+      <div class="part-num">Bloc 05 · Cap. 11-13</div>
+      <div class="part-name" data-i18n="bloc5_name">DCL i programacio</div>
+      <ul class="part-topics" data-i18n-html="bloc5_topics"><li>Procediments i funcions MySQL</li><li>Procediments i funcions pgSQL</li><li>Cursors i triggers</li><li>Usuaris, privilegis i rols</li></ul>
+    </div>
+    <div class="part-card amber-accent">
+      <div class="part-num">Bloc 06 · Cap. 14</div>
+      <div class="part-name" data-i18n="bloc6_name">Mes enlla del relacional</div>
+      <ul class="part-topics" data-i18n-html="bloc6_topics"><li>Origens i families NoSQL</li><li>MongoDB: disseny documental</li><li>Operacions CRUD</li><li>Consultes avancades</li><li>Indexacio a MongoDB</li><li>Seguretat</li><li>Framework d'agregacio</li></ul>
+    </div>
+  </div>
+  <div class="repo-box">
+    <div class="repo-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg></div>
+    <div class="repo-text">
+      <div class="repo-title" data-i18n="repo_title">Exercicis resolts i recursos addicionals</div>
+      <div class="repo-desc" data-i18n="repo_desc">El llibre inclou exercicis resolts i material complementari disponible en un repositori public de GitHub.</div>
+    </div>
+    <a href="https://bit.ly/basesdedades360" target="_blank" class="repo-link">bit.ly/basesdedades360</a>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section id="tecnologies">
+  <div class="section-tag" data-i18n="nav_tecnologies">Tecnologies</div>
+  <h2 class="section-title" data-i18n="tech_title">Eines i motors que trobaras al llibre</h2>
+  <p class="section-lead" data-i18n="tech_lead">360 de cobertura: del disseny relacional fins al NoSQL, passant per SQL, programacio i seguretat.</p>
+  <div class="tech-circle-section">
+    <div class="tech-circle-wrap" id="techCircle">
+      <div class="tech-track"></div>
+      <div class="tech-glow-dot" id="techGlowDot"></div>
+      <div class="tech-center">
+        <span class="tech-center-num">360°</span>
+        <span class="tech-center-sub" id="techCenterSub">Bases de<br>Dades</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section id="contacte">
+  <div class="contact-two-col">
+    <div class="contact-col">
+      <div class="contact-col-title" data-i18n="nav_contacte">Contacte</div>
+      <h3 data-i18n="contacte_title">Poseu-vos en contacte</h3>
+      <p data-i18n="contacte_desc">Sou alumne, docent o simplement teniu curiositat? Estic obert a qualsevol consulta.</p>
+      <form class="contact-form" id="contactForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="cf-name" data-i18n="form_name_label">Nom</label>
+            <input type="text" id="cf-name" name="name" data-i18n-placeholder="form_name_ph" placeholder="El teu nom" required>
+          </div>
+          <div class="form-group">
+            <label for="cf-email" data-i18n="form_email_label">Correu electronic</label>
+            <input type="email" id="cf-email" name="email" data-i18n-placeholder="form_email_ph" placeholder="tu@exemple.com" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="cf-subject" data-i18n="form_subject_label">Assumpte</label>
+          <input type="text" id="cf-subject" name="subject" data-i18n-placeholder="form_subject_ph" placeholder="Sobre el llibre...">
+        </div>
+        <div class="form-group">
+          <label for="cf-msg" data-i18n="form_msg_label">Missatge</label>
+          <textarea id="cf-msg" name="message" rows="6" data-i18n-placeholder="form_msg_ph" placeholder="Escriu aqui el teu missatge..." required></textarea>
+        </div>
+        <button type="submit" class="btn-primary" id="cf-submit" data-i18n="form_submit">Enviar missatge</button>
+        <div id="cf-feedback" class="cf-feedback" style="display:none;"></div>
+      </form>
+    </div>
+    <div class="contact-col">
+      <div class="contact-col-title" data-i18n="segueixme_tag">Segueix-me</div>
+      <h3 data-i18n="segueixme_title">Xarxes socials</h3>
+      <p data-i18n="segueixme_desc">Connecta'm a LinkedIn o explora el repositori del llibre a GitHub.</p>
+      <div class="social-cards">
+        <a class="social-card linkedin" href="https://www.linkedin.com/in/jordi-quesada-balaguer/" target="_blank">
+          <div class="social-card-icon linkedin-color"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></div>
+          <div class="social-card-text"><div class="social-card-name">LinkedIn</div><div class="social-card-handle">jordi-quesada-balaguer</div></div>
+          <svg class="social-card-arrow" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </a>
+        <a class="social-card github" href="https://bit.ly/basesdedades360" target="_blank">
+          <div class="social-card-icon github-color"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></div>
+          <div class="social-card-text"><div class="social-card-name">GitHub</div><div class="social-card-handle">basesdedades360</div></div>
+          <svg class="social-card-arrow" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>© 2025 Jordi Quesada Balaguer — Bases de dades 360°: del disseny al NoSQL</p>
+  <p style="margin-top:0.5rem;opacity:0.5;" data-i18n="footer_rights">Tots els drets reservats</p>
+</footer>
+
+<script>
+const T = {
+  ca: {
+    nav_inici:'Inici', nav_autor:'Autor', nav_trajectoria:'Trajectòria', nav_llibre:'El llibre', nav_continguts:'Continguts', nav_tecnologies:'Tecnologies', nav_contacte:'Contacte',
+    hero_eyebrow:'Enginyer · Professor · Autor',
+    hero_subtitle:'Bases de dades · Docència · Barcelona',
+    hero_desc:'Desprès de més de 20 anys a l\'aula, he escrit un llibre pensat especialment per als meus alumnes de cicles formatius.<br><em>Bases de dades 360°: del disseny al NoSQL</em>, un llibre pensat des de l\'aula i per a l\'aula.',
+    hero_btn1:'Descobrir el llibre', hero_btn2:'Sobre l\'autor',
+    autor_title:'Qui soc?',
+    autor_bio1:'Sóc enginyer informàtic per la Facultat d\'Informàtica de Barcelona (FIB). Abans de dedicar-me a la docència, vaig treballar com a programador i analista programador en una consultora informàtica, una experiència que em va ensenyar que la teoria només té sentit quan es posa en pràctica.',
+    autor_bio2:'Des del 2002 sóc professor al Departament d\'Educació i Formació Professional de la Generalitat de Catalunya, i fa més d\'una dècada que explico bases de dades —MySQL, Oracle, PostgreSQL i MongoDB— a diferents instituts, actualment a l\'Institut TIC de Barcelona. En aquests anys també he estat tutor i cap del departament d\'informàtica.',
+    autor_bio3:'Visc a Barcelona amb la meva família, que és, amb diferència, el millor de la meva vida.',
+    stat1_label:'Anys docent', stat2_label:'Anys BBDD', stat3_label:'Motors BBDD',
+    traj_title:'Un camí des del codi fins a l\'aula',
+    tl1_year:'Etapa professional', tl1_title:'Programador i Analista Programador',
+    tl1_desc:'Consultora informàtica. Primera etapa al món laboral, treballant amb projectes de datamining i datawarehousing.',
+    tl2_title:'Inici de la docència — Departament d\'Educació i Formació Professional, Generalitat de Catalunya',
+    tl2_desc:'Començo a impartir classes d\'informàtica als cicles formatius de grau superior, combinant sistemes operatius, programació web (PHP, JavaScript, HTML/CSS, Laravel, Symfony) i bases de dades.',
+    tl3_year:'Instituts Carles Vallbona · Rambla Prim · Joan d\'Àustria', tl3_title:'Professor, tutor i cap de departament',
+    tl3_desc:'Anys de consolidació docent. A més de l\'activitat lectiva, algun any he pogut ser tutor d\'alumnes i, durant diversos anys, cap del departament d\'informàtica.',
+    tl4_year:'Últims 10 anys', tl4_title:'Especialització en Bases de Dades',
+    tl4_desc:'Els últims anys he pogut impartir el mòdul de Bases de dades als cicles de DAM i DAW, centrant-me especialment en MySQL, PostgreSQL, Oracle i MongoDB.',
+    tl5_year:'Actualitat — Institut TIC de Barcelona', tl5_title:'Professor de Bases de Dades · Autor',
+    tl5_desc:'Segueixo impartint el mòdul de Bases de dades però els últims mesos he pogut entrar en el projecte de creació del llibre <em>Bases de dades 360°: del disseny al NoSQL</em>.',
+    llibre_title:'Del disseny al NoSQL, sense deixar res pel camí', llibre_badge:'Pròximament',
+    llibre_desc1:'Un recurs complet que acompanya l\'alumne des dels fonaments del disseny de bases de dades fins a les tecnologies NoSQL actuals. Escrit des de l\'experiència real a l\'aula, amb exemples pràctics, exercicis progressius i una estructura pensada per als cicles formatius.',
+    llibre_desc2:'Escrit amb la intenció que tots els alumnes puguin arribar fins al final amb confiança i amb ganes de més.',
+    llibre_audience_label:'A qui va dirigit:', llibre_audience_text:'Alumnes de cicles formatius de grau superior d\'informàtica, estudiants autodidactes i docents que busquen un material estructurat i complet.',
+    continguts_title:'Estructura del llibre', continguts_lead:'Sis blocs i catorze capítols que cobreixen el cicle complet d\'una base de dades: des del disseny conceptual fins a MongoDB.',
+    bloc1_name:'Pensar abans d\'actuar', bloc1_topics:'<li>Per què existeixen les BBDD relacionals</li><li>Model Entitat-Relació</li><li>Transformació al model relacional</li><li>Normalització (1FN, 2FN, 3FN, FNBC)</li>',
+    bloc2_name:'DDL: definir l\'estructura', bloc2_topics:'<li>Disseny físic de taules</li><li>Tipus de dades i restriccions</li><li>Modificació d\'esquemes</li>',
+    bloc3_name:'DML: operacions fonamentals', bloc3_topics:'<li>INSERT, UPDATE, DELETE</li><li>Consultes amb filtratge i ordenació</li><li>Expressions regulars</li><li>Funcions integrades</li>',
+    bloc4_name:'DML: consultes avançades', bloc4_topics:'<li>Agregació, agrupació i joins</li><li>Índexos i plans d\'execució (EXPLAIN)</li><li>Transaccions i propietats ACID</li><li>Vistes i diccionari de dades</li>',
+    bloc5_name:'DCL i programació', bloc5_topics:'<li>Procediments i funcions MySQL</li><li>Procediments i funcions pgSQL</li><li>Cursors i triggers</li><li>Usuaris, privilegis i rols</li>',
+    bloc6_name:'Més enllà del relacional', bloc6_topics:'<li>Orígens i famílies NoSQL</li><li>MongoDB: disseny documental</li><li>Operacions CRUD</li><li>Consultes avançades</li><li>Indexació a MongoDB</li><li>Seguretat</li><li>Framework d\'agregació</li>',
+    repo_title:'Exercicis resolts i recursos addicionals', repo_desc:'El llibre inclou exercicis resolts i material complementari disponible en un repositori públic de GitHub.',
+    tech_title:'Eines i motors que trobaràs al llibre', tech_lead:'360° de cobertura: del disseny relacional fins al NoSQL, passant per SQL, programació i seguretat.',
+    tech_center_sub:'Bases de<br>Dades',
+    tech_items:['MySQL','Model ER','PostgreSQL','Normalització','MongoDB','Model relacional','pgSQL','DDL','SQL','DML','Procediments emmagatzemats','DCL','NoSQL','Transaccions','Joins','Agrupacions','Subconsultes'],
+    contacte_title:'Poseu-vos en contacte', contacte_desc:'Sou alumne, docent o simplement teniu curiositat? Estic obert a qualsevol consulta relacionada amb el llibre o amb les bases de dades.',
+    form_name_label:'Nom', form_name_ph:'El teu nom', form_email_label:'Correu electrònic', form_email_ph:'tu@exemple.com',
+    form_subject_label:'Assumpte', form_subject_ph:'Sobre el llibre / Consulta docent…', form_msg_label:'Missatge', form_msg_ph:'Escriu aquí el teu missatge…',
+    form_submit:'Enviar missatge', form_sending:'Enviant…', form_ok:'Missatge enviat correctament. Gràcies!', form_err:'Hi ha hagut un error en enviar el missatge. Torna-ho a intentar.',
+    segueixme_tag:'Segueix-me', segueixme_title:'Xarxes socials', segueixme_desc:'Connecta\'m a LinkedIn o explora el repositori del llibre a GitHub amb tots els exercicis i recursos addicionals.',
+    footer_rights:'Tots els drets reservats',
+  },
+  es: {
+    nav_inici:'Inicio', nav_autor:'Autor', nav_trajectoria:'Trayectoria', nav_llibre:'El libro', nav_continguts:'Contenidos', nav_tecnologies:'Tecnologías', nav_contacte:'Contacto',
+    hero_eyebrow:'Ingeniero · Profesor · Autor',
+    hero_subtitle:'Bases de datos · Docencia · Barcelona',
+    hero_desc:'Después de más de 20 años en el aula, he escrito un libro pensado especialmente para mis alumnos de ciclos formativos.<br><em>Bases de dades 360°: del disseny al NoSQL</em>, un libro pensado desde el aula y para el aula.',
+    hero_btn1:'Descubrir el libro', hero_btn2:'Sobre el autor',
+    autor_title:'¿Quién soy?',
+    autor_bio1:'Soy ingeniero informático por la Facultad de Informática de Barcelona (FIB). Antes de dedicarme a la docencia, trabajé como programador y analista programador en una consultora informática, una experiencia que me enseñó que la teoría solo tiene sentido cuando se pone en práctica.',
+    autor_bio2:'Desde 2002 soy profesor en el Departament d\'Educació i Formació Professional de la Generalitat de Catalunya, y llevo más de una década impartiendo bases de datos —MySQL, Oracle, PostgreSQL y MongoDB— en distintos institutos, actualmente en el Institut TIC de Barcelona. En estos años también he sido tutor y jefe del departamento de informática.',
+    autor_bio3:'Vivo en Barcelona con mi familia, que es, con diferencia, lo mejor de mi vida.',
+    stat1_label:'Años docente', stat2_label:'Años BBDD', stat3_label:'Motores BBDD',
+    traj_title:'Un camino desde el código hasta el aula',
+    tl1_year:'Etapa profesional', tl1_title:'Programador y Analista Programador',
+    tl1_desc:'Consultora informática. Primera etapa en el mundo laboral, trabajando con proyectos de datamining y datawarehousing.',
+    tl2_title:'Inicio de la docencia — Departament d\'Educació i Formació Professional, Generalitat de Catalunya',
+    tl2_desc:'Comienzo a impartir clases de informática en los ciclos formativos de grado superior, combinando sistemas operativos, programación web (PHP, JavaScript, HTML/CSS, Laravel, Symfony) y bases de datos.',
+    tl3_year:'Instituts Carles Vallbona · Rambla Prim · Joan d\'Àustria', tl3_title:'Profesor, tutor y jefe de departamento',
+    tl3_desc:'Años de consolidación docente. Además de la actividad lectiva, algunos años he podido ser tutor de alumnos y, durante varios años, jefe del departamento de informática.',
+    tl4_year:'Últimos 10 años', tl4_title:'Especialización en Bases de Datos',
+    tl4_desc:'En los últimos años he podido impartir el módulo de Bases de datos en los ciclos de DAM y DAW, centrándome especialmente en MySQL, PostgreSQL, Oracle y MongoDB.',
+    tl5_year:'Actualidad — Institut TIC de Barcelona', tl5_title:'Profesor de Bases de Datos · Autor',
+    tl5_desc:'Sigo impartiendo el módulo de Bases de datos, pero en los últimos meses me he embarcado en el proyecto de crear el libro <em>Bases de dades 360°: del disseny al NoSQL</em>.',
+    llibre_title:'Del diseño al NoSQL, sin dejar nada por el camino', llibre_badge:'Próximamente',
+    llibre_desc1:'Un recurso completo que acompaña al alumno desde los fundamentos del diseño de bases de datos hasta las tecnologías NoSQL actuales. Escrito desde la experiencia real en el aula, con ejemplos prácticos, ejercicios progresivos y una estructura pensada para los ciclos formativos.',
+    llibre_desc2:'Escrito con la intención de que todos los alumnos puedan llegar hasta el final con confianza y con ganas de más.',
+    llibre_audience_label:'A quién va dirigido:', llibre_audience_text:'Alumnos de ciclos formativos de grado superior de informática, estudiantes autodidactas y docentes que buscan un material estructurado y completo.',
+    continguts_title:'Estructura del libro', continguts_lead:'Seis bloques y catorce capítulos que cubren el ciclo completo de una base de datos: desde el diseño conceptual hasta MongoDB.',
+    bloc1_name:'Pensar antes de actuar', bloc1_topics:'<li>Por qué existen las BBDD relacionales</li><li>Modelo Entidad-Relación</li><li>Transformación al modelo relacional</li><li>Normalización (1FN, 2FN, 3FN, FNBC)</li>',
+    bloc2_name:'DDL: definir la estructura', bloc2_topics:'<li>Diseño físico de tablas</li><li>Tipos de datos y restricciones</li><li>Modificación de esquemas</li>',
+    bloc3_name:'DML: operaciones fundamentales', bloc3_topics:'<li>INSERT, UPDATE, DELETE</li><li>Consultas con filtrado y ordenación</li><li>Expresiones regulares</li><li>Funciones integradas</li>',
+    bloc4_name:'DML: consultas avanzadas', bloc4_topics:'<li>Agregación, agrupación y joins</li><li>Índices y planes de ejecución (EXPLAIN)</li><li>Transacciones y propiedades ACID</li><li>Vistas y diccionario de datos</li>',
+    bloc5_name:'DCL y programación', bloc5_topics:'<li>Procedimientos y funciones MySQL</li><li>Procedimientos y funciones pgSQL</li><li>Cursores y triggers</li><li>Usuarios, privilegios y roles</li>',
+    bloc6_name:'Más allá del relacional', bloc6_topics:'<li>Orígenes y familias NoSQL</li><li>MongoDB: diseño documental</li><li>Operaciones CRUD</li><li>Consultas avanzadas</li><li>Indexación en MongoDB</li><li>Seguridad</li><li>Framework de agregación</li>',
+    repo_title:'Ejercicios resueltos y recursos adicionales', repo_desc:'El libro incluye ejercicios resueltos y material complementario disponible en un repositorio público de GitHub.',
+    tech_title:'Herramientas y motores que encontrarás en el libro', tech_lead:'360° de cobertura: del diseño relacional hasta el NoSQL, pasando por SQL, programación y seguridad.',
+    tech_center_sub:'Bases de<br>Datos',
+    tech_items:['MySQL','Modelo ER','PostgreSQL','Normalización','MongoDB','Modelo relacional','pgSQL','DDL','SQL','DML','Procedimientos almacenados','DCL','NoSQL','Transacciones','Joins','Agrupaciones','Subconsultas'],
+    contacte_title:'Poneos en contacto', contacte_desc:'¿Sois alumnos, docentes o simplemente tenéis curiosidad? Estoy abierto a cualquier consulta relacionada con el libro o con las bases de datos.',
+    form_name_label:'Nombre', form_name_ph:'Tu nombre', form_email_label:'Correo electrónico', form_email_ph:'tu@ejemplo.com',
+    form_subject_label:'Asunto', form_subject_ph:'Sobre el libro / Consulta docente…', form_msg_label:'Mensaje', form_msg_ph:'Escribe aquí tu mensaje…',
+    form_submit:'Enviar mensaje', form_sending:'Enviando…', form_ok:'¡Mensaje enviado correctamente. Gracias!', form_err:'Ha habido un error al enviar el mensaje. Inténtalo de nuevo.',
+    segueixme_tag:'Sígueme', segueixme_title:'Redes sociales', segueixme_desc:'Conéctate conmigo en LinkedIn o explora el repositorio del libro en GitHub con todos los ejercicios y recursos adicionales.',
+    footer_rights:'Todos los derechos reservados',
+  },
+  en: {
+    nav_inici:'Home', nav_autor:'Author', nav_trajectoria:'Career', nav_llibre:'The book', nav_continguts:'Contents', nav_tecnologies:'Technologies', nav_contacte:'Contact',
+    hero_eyebrow:'Engineer · Teacher · Author',
+    hero_subtitle:'Databases · Teaching · Barcelona',
+    hero_desc:'After more than 20 years in the classroom, I have written a book especially designed for my vocational training students.<br><em>Bases de dades 360°: del disseny al NoSQL</em>, a book conceived from the classroom and for the classroom.',
+    hero_btn1:'Discover the book', hero_btn2:'About the author',
+    autor_title:'Who am I?',
+    autor_bio1:'I am a Computer Engineer from the Facultat d\'Informàtica de Barcelona (FIB). Before moving into teaching, I worked as a programmer and systems analyst at an IT consultancy — an experience that taught me that theory only makes sense when put into practice.',
+    autor_bio2:'Since 2002 I have been a teacher at the Departament d\'Educació i Formació Professional of the Generalitat de Catalunya, spending over a decade teaching databases — MySQL, Oracle, PostgreSQL and MongoDB — at schools in Barcelona, currently at the Institut TIC. I have also served as a tutor and head of the IT department.',
+    autor_bio3:'I live in Barcelona with my family, who are, without question, the best part of my life.',
+    stat1_label:'Teaching years', stat2_label:'DB years', stat3_label:'DB engines',
+    traj_title:'A journey from code to the classroom',
+    tl1_year:'Professional stage', tl1_title:'Programmer and Systems Analyst',
+    tl1_desc:'IT consultancy. First professional stage, working on datamining and datawarehousing projects.',
+    tl2_title:'Start of teaching — Departament d\'Educació i Formació Professional, Generalitat de Catalunya',
+    tl2_desc:'I begin teaching computer science in upper vocational training programmes, combining operating systems, web programming (PHP, JavaScript, HTML/CSS, Laravel, Symfony) and databases.',
+    tl3_year:'Schools: Carles Vallbona · Rambla Prim · Joan d\'Àustria', tl3_title:'Teacher, tutor and head of department',
+    tl3_desc:'Years of teaching consolidation. Beyond the classroom, I served as a student tutor and, for several years, as head of the IT department.',
+    tl4_year:'Last 10 years', tl4_title:'Specialisation in Databases',
+    tl4_desc:'Over recent years I have focused on the Databases module in the DAM and DAW programmes, specialising in MySQL, PostgreSQL, Oracle and MongoDB.',
+    tl5_year:'Present — Institut TIC de Barcelona', tl5_title:'Database Teacher · Author',
+    tl5_desc:'I continue teaching the Databases module while, over the past months, I have embarked on the project of writing the book <em>Bases de dades 360°: del disseny al NoSQL</em>.',
+    llibre_title:'From design to NoSQL, leaving nothing behind', llibre_badge:'Coming soon',
+    llibre_desc1:'A comprehensive resource that guides students from the fundamentals of database design through to current NoSQL technologies. Written from real classroom experience, with practical examples, progressive exercises and a structure tailored for vocational training programmes.',
+    llibre_desc2:'Written with the intention that every student can reach the end with confidence and wanting more.',
+    llibre_audience_label:'Who it\'s for:', llibre_audience_text:'Students in upper vocational IT programmes, self-taught learners and teachers looking for well-structured, comprehensive material.',
+    continguts_title:'Book structure', continguts_lead:'Six blocks and fourteen chapters covering the full database lifecycle: from conceptual design all the way to MongoDB.',
+    bloc1_name:'Think before you act', bloc1_topics:'<li>Why relational databases exist</li><li>Entity-Relationship model</li><li>Transformation to the relational model</li><li>Normalisation (1NF, 2NF, 3NF, BCNF)</li>',
+    bloc2_name:'DDL: defining the structure', bloc2_topics:'<li>Physical table design</li><li>Data types and constraints</li><li>Schema modification</li>',
+    bloc3_name:'DML: fundamental operations', bloc3_topics:'<li>INSERT, UPDATE, DELETE</li><li>Queries with filtering and sorting</li><li>Regular expressions</li><li>Built-in functions</li>',
+    bloc4_name:'DML: advanced queries', bloc4_topics:'<li>Aggregation, grouping and joins</li><li>Indexes and execution plans (EXPLAIN)</li><li>Transactions and ACID properties</li><li>Views and data dictionary</li>',
+    bloc5_name:'DCL and programming', bloc5_topics:'<li>MySQL procedures and functions</li><li>pgSQL procedures and functions</li><li>Cursors and triggers</li><li>Users, privileges and roles</li>',
+    bloc6_name:'Beyond the relational model', bloc6_topics:'<li>Origins and NoSQL families</li><li>MongoDB: document design</li><li>CRUD operations</li><li>Advanced queries</li><li>MongoDB indexing</li><li>Security</li><li>Aggregation framework</li>',
+    repo_title:'Solved exercises and additional resources', repo_desc:'The book includes solved exercises and supplementary material available in a public GitHub repository.',
+    tech_title:'Tools and engines you will find in the book', tech_lead:'360° of coverage: from relational design to NoSQL, through SQL, programming and security.',
+    tech_center_sub:'Data<br>bases',
+    tech_items:['MySQL','ER Model','PostgreSQL','Normalization','MongoDB','Relational model','pgSQL','DDL','SQL','DML','Stored procedures','DCL','NoSQL','Transactions','Joins','Groupings','Subqueries'],
+    contacte_title:'Get in touch', contacte_desc:'Are you a student, a teacher or just curious? I am happy to answer any question about the book or about databases.',
+    form_name_label:'Name', form_name_ph:'Your name', form_email_label:'Email address', form_email_ph:'you@example.com',
+    form_subject_label:'Subject', form_subject_ph:'About the book / Teaching inquiry…', form_msg_label:'Message', form_msg_ph:'Write your message here…',
+    form_submit:'Send message', form_sending:'Sending…', form_ok:'Message sent successfully. Thank you!', form_err:'There was an error sending the message. Please try again.',
+    segueixme_tag:'Follow me', segueixme_title:'Social networks', segueixme_desc:'Connect with me on LinkedIn or explore the book\'s repository on GitHub with all the exercises and additional resources.',
+    footer_rights:'All rights reserved',
+  }
+};
+
+let currentLang = 'ca';
+
+function applyLang(lang) {
+  currentLang = lang;
+  const d = T[lang];
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-i18n]').forEach(el => { if (d[el.dataset.i18n] !== undefined) el.textContent = d[el.dataset.i18n]; });
+  document.querySelectorAll('[data-i18n-html]').forEach(el => { if (d[el.dataset.i18nHtml] !== undefined) el.innerHTML = d[el.dataset.i18nHtml]; });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => { if (d[el.dataset.i18nPlaceholder] !== undefined) el.placeholder = d[el.dataset.i18nPlaceholder]; });
+  const sub = document.getElementById('techCenterSub');
+  if (sub && d.tech_center_sub) sub.innerHTML = d.tech_center_sub;
+  rebuildTechCircle(lang);
+  document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.lang === lang));
+}
+
+const CX = 340, CY = 340, RADIUS_LABEL = 310, RADIUS_DOT = 258;
+let techDotPositions = [], techActive = 0, techStarted = false;
+const TECH_STEP = 900, TECH_PAUSE = 2000;
+
+function rebuildTechCircle(lang) {
+  const wrap = document.getElementById('techCircle');
+  wrap.querySelectorAll('.tech-item').forEach(el => el.remove());
+  const items = T[lang].tech_items;
+  techDotPositions = [];
+  items.forEach((label, i) => {
+    const angle = (i / items.length) * 2 * Math.PI - Math.PI / 2;
+    const cx = CX + RADIUS_LABEL * Math.cos(angle);
+    const cy = CY + RADIUS_LABEL * Math.sin(angle);
+    const el = document.createElement('div');
+    el.className = 'tech-item';
+    el.textContent = label;
+    const DEG = angle * 180 / Math.PI;
+    if (DEG >= -45 && DEG < 45)                                          { el.style.left = cx+'px'; el.style.top = cy+'px'; el.style.transform = 'translateY(-50%)'; }
+    else if (DEG >= 45 && DEG < 135)                                     { el.style.left = cx+'px'; el.style.top = cy+'px'; el.style.transform = 'translateX(-50%)'; }
+    else if ((DEG >= 135 && DEG <= 180)||(DEG >= -180 && DEG < -135))   { el.style.right = (680-cx)+'px'; el.style.top = cy+'px'; el.style.transform = 'translateY(-50%)'; }
+    else                                                                   { el.style.left = cx+'px'; el.style.top = cy+'px'; el.style.transform = 'translateX(-50%) translateY(-100%)'; }
+    wrap.appendChild(el);
+    techDotPositions.push({ x: CX + RADIUS_DOT * Math.cos(angle), y: CY + RADIUS_DOT * Math.sin(angle) });
+  });
+  techActive = 0;
+  positionGlow(0);
+}
+
+function positionGlow(idx) {
+  if (!techDotPositions[idx]) return;
+  const dot = document.getElementById('techGlowDot');
+  dot.style.left = techDotPositions[idx].x + 'px';
+  dot.style.top  = techDotPositions[idx].y + 'px';
+}
+
+function techStep() {
+  positionGlow(techActive);
+  const isLast = techActive === T[currentLang].tech_items.length - 1;
+  setTimeout(() => { techActive = isLast ? 0 : techActive + 1; techStep(); }, isLast ? TECH_STEP + TECH_PAUSE : TECH_STEP);
+}
+
+new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting && !techStarted) { techStarted = true; techStep(); } });
+}, { threshold: 0.2 }).observe(document.getElementById('tecnologies'));
+
+const counters = document.querySelectorAll('.stat-number[data-target]');
+const DURATION = 1600, PAUSE = 2200;
+function easeOutQuart(t) { return 1 - Math.pow(1 - t, 4); }
+function animateCounter(el) {
+  const target = parseInt(el.dataset.target, 10), prefix = el.dataset.prefix || '';
+  let startTime = null;
+  function step(ts) {
+    if (!startTime) startTime = ts;
+    const progress = Math.min((ts - startTime) / DURATION, 1);
+    el.textContent = prefix + Math.round(easeOutQuart(progress) * target);
+    if (progress < 1) requestAnimationFrame(step);
+    else { el.textContent = prefix + target; setTimeout(() => animateCounter(el), PAUSE); }
+  }
+  requestAnimationFrame(step);
+}
+let countersStarted = false;
+new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting && !countersStarted) { countersStarted = true; counters.forEach((el, i) => setTimeout(() => animateCounter(el), i * 200)); } });
+}, { threshold: 0.5 }).observe(document.querySelector('.autor-stats'));
+
+const tlItems = Array.from(document.querySelectorAll('.tl-item'));
+let tlIndex = 0, tlStarted = false;
+function tlStep() {
+  tlItems.forEach((item, i) => item.classList.toggle('tl-active', i === tlIndex));
+  const isLast = tlIndex === tlItems.length - 1;
+  setTimeout(() => { if (isLast) { tlItems.forEach(item => item.classList.remove('tl-active')); tlIndex = 0; } else tlIndex++; tlStep(); }, isLast ? 700 + 2200 : 700);
+}
+new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting && !tlStarted) { tlStarted = true; tlStep(); } });
+}, { threshold: 0.3 }).observe(document.querySelector('#trajectoria'));
+
+const sections = Array.from(document.querySelectorAll('section[id]'));
+let isScrolling = false;
+function getCurrentSectionIndex() {
+  let best = 0, bestScore = -Infinity;
+  sections.forEach((sec, i) => { const r = sec.getBoundingClientRect(); const ov = Math.max(0, Math.min(r.bottom, window.innerHeight) - Math.max(r.top, 0)); if (ov > bestScore) { bestScore = ov; best = i; } });
+  return best;
+}
+function scrollToSection(i) { if (i < 0 || i >= sections.length) return; isScrolling = true; sections[i].scrollIntoView({ behavior: 'smooth', block: 'start' }); setTimeout(() => { isScrolling = false; }, 900); }
+document.addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if (isScrolling) return;
+  if (['ArrowDown','ArrowRight'].includes(e.key)) { e.preventDefault(); scrollToSection(getCurrentSectionIndex() + 1); }
+  else if (['ArrowUp','ArrowLeft'].includes(e.key)) { e.preventDefault(); scrollToSection(getCurrentSectionIndex() - 1); }
+});
+
+const navLinks = document.querySelectorAll('.nav-links a');
+sections.forEach(sec => new IntersectionObserver((entries) => {
+  entries.forEach(entry => { if (entry.isIntersecting) { navLinks.forEach(a => a.style.color = ''); const active = document.querySelector('.nav-links a[href="#'+entry.target.id+'"]'); if (active) active.style.color = 'var(--teal)'; } });
+}, { threshold: 0.4 }).observe(sec));
+
+document.getElementById('contactForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const btn = document.getElementById('cf-submit');
+  const feedback = document.getElementById('cf-feedback');
+  const d = T[currentLang];
+  btn.textContent = d.form_sending; btn.disabled = true; feedback.style.display = 'none';
+  try {
+    const res = await fetch('https://formspree.io/f/mykvvgga', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify({ name: document.getElementById('cf-name').value, email: document.getElementById('cf-email').value, subject: document.getElementById('cf-subject').value, message: document.getElementById('cf-msg').value }) });
+    if (res.ok) { feedback.textContent = d.form_ok; feedback.className = 'cf-feedback ok'; this.reset(); }
+    else throw new Error();
+  } catch { feedback.textContent = d.form_err; feedback.className = 'cf-feedback err'; }
+  feedback.style.display = 'block'; btn.textContent = d.form_submit; btn.disabled = false;
+});
+
+document.querySelectorAll('.lang-btn').forEach(btn => btn.addEventListener('click', () => applyLang(btn.dataset.lang)));
+
+// Hamburger menu
+const hamburger = document.getElementById('navHamburger');
+const mobileMenu = document.getElementById('mobileMenu');
+function closeMobileMenu() {
+  hamburger.classList.remove('open');
+  mobileMenu.classList.remove('open');
+  hamburger.setAttribute('aria-expanded', 'false');
+  document.body.style.overflow = '';
+}
+hamburger.addEventListener('click', () => {
+  const isOpen = hamburger.classList.toggle('open');
+  mobileMenu.classList.toggle('open', isOpen);
+  hamburger.setAttribute('aria-expanded', isOpen);
+  document.body.style.overflow = isOpen ? 'hidden' : '';
+});
+document.querySelectorAll('.mobile-nav-link').forEach(link => {
+  link.addEventListener('click', closeMobileMenu);
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMobileMenu(); });
+
+rebuildTechCircle('ca');
+</script>
+</body>
+</html>
