@@ -102,8 +102,10 @@
   .repo-link { font-family: var(--mono); font-size: 13px; color: var(--teal); text-decoration: none; white-space: nowrap; border: 1px solid rgba(14,165,233,0.3); border-radius: 4px; padding: 0.4rem 0.9rem; transition: background 0.2s; }
   .repo-link:hover { background: rgba(14,165,233,0.1); }
   .book-card { margin-top: 3.5rem; background: var(--navy3); border: 1px solid var(--border-bright); border-radius: 8px; padding: 2.5rem; display: grid; grid-template-columns: auto 1fr; gap: 3rem; align-items: start; }
-  .book-cover { width: 180px; background: var(--navy4); aspect-ratio: 2/3; border-radius: 4px; border: 1px solid var(--border-bright); display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 1.5rem 1rem; position: relative; overflow: hidden; }
-  .book-cover::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(14,165,233,0.15) 0%, transparent 60%); }
+  .book-cover { width: 180px; background: var(--navy4); border-radius: 4px; border: 1px solid var(--border-bright); display: flex; flex-direction: column; align-items: stretch; gap: 1rem; padding: 1rem; position: relative; overflow: visible; }
+  .book-cover::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(14,165,233,0.15) 0%, transparent 60%); pointer-events: none; }
+  .cover-image { width: 100%; height: 260px; border-radius: 4px; overflow: hidden; background: var(--navy3); }
+  .cover-image img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .book-cover-tag { font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; color: var(--teal); text-transform: uppercase; z-index: 1; }
   .book-cover-title { font-family: var(--serif); font-size: 1.1rem; color: var(--text); text-align: center; line-height: 1.3; z-index: 1; }
   .book-cover-accent { width: 40px; height: 2px; background: var(--amber); z-index: 1; margin: 0.5rem 0; }
@@ -194,6 +196,32 @@
     .book-cover { width: 140px; margin: 0 auto; }
     .autor-stats { grid-template-columns: repeat(3,1fr); }
   }
+  .btn-cta {
+  display: inline-block;
+  padding: 14px 28px;
+  background-color: #1a73e8; /* Blau net i modern */
+  color: #ffffff;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  position: relative;
+  z-index: 2;
+}
+
+.book-cover .btn-cta {
+  display: block;
+  width: 100%;
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+.btn-cta:hover {
+  background-color: #1558b0;
+  transform: translateY(-2px);
+}
+
 </style>
 <link rel="icon" type="image/png" href="./img/favicon.png">
 </head>
@@ -342,17 +370,12 @@
   <h2 class="section-title" data-i18n="llibre_title">Del disseny al NoSQL, sense deixar res pel cami</h2>
   <div class="book-card">
     <div class="book-cover">
-      <span class="book-cover-tag">BBDD 360°</span>
-      <div style="text-align:center;z-index:1;">
-        <div class="book-cover-title">Bases de dades 360°</div>
-        <div class="book-cover-accent" style="margin:0.8rem auto;"></div>
-        <div class="book-cover-sub">del disseny al NoSQL</div>
-      </div>
-      <span class="book-cover-author">Jordi Quesada Balaguer</span>
+      <div class="cover-image"><a href="https://www.bubok.es/libros/286477/bases-de-dades-360-del-disseny-al-nosql" target="_blank" rel="noopener noreferrer"><img src="./img/portada.png" alt="Portada — Bases de dades 360°"></a></div>
+      <a href="https://www.bubok.es/libros/286477/bases-de-dades-360-del-disseny-al-nosql" class="btn-cta" target="_blank" rel="noopener noreferrer">Comprar o descarregar</a>
     </div>
     <div class="book-info">
       <h3 class="book-title-display">Bases de dades 360°:<br><em>del disseny al NoSQL</em></h3>
-      <span class="book-badge" data-i18n="llibre_badge">Proximament</span>
+      <span class="book-badge" data-i18n="llibre_badge">Disponible</span>
       <p class="book-desc" data-i18n="llibre_desc1">Un recurs complet que acompanya l'alumne des dels fonaments del disseny de bases de dades fins a les tecnologies NoSQL actuals.</p>
       <p class="book-desc" data-i18n="llibre_desc2">Escrit amb la intencio que tots els alumnes puguin arribar fins al final amb confianca i amb ganes de mes.</p>
       <div class="book-audience">
@@ -486,6 +509,25 @@
 </footer>
 
 <script>
+// JSON-LD Book schema for SEO
+const bookJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Book",
+  "name": "Bases de dades 360°: del disseny al NoSQL",
+  "author": { "@type": "Person", "name": "Jordi Quesada Balaguer" },
+  "url": "https://jordiquesada.github.io/",
+  "image": "https://jordiquesada.github.io/img/portada.png",
+  "description": "Un recurs complet que acompanya l'alumne des dels fonaments del disseny de bases de dades fins a les tecnologies NoSQL actuals.",
+  "publisher": { "@type": "Organization", "name": "Autopublicat / Bubok" },
+  "datePublished": "2025",
+  "isbn": "",
+  "offers": {
+    "@type": "Offer",
+    "url": "https://www.bubok.es/libros/286477/bases-de-dades-360-del-disseny-al-nosql",
+    "availability": "https://schema.org/InStock"
+  }
+};
+const s = document.createElement('script'); s.type = 'application/ld+json'; s.text = JSON.stringify(bookJsonLd); document.head.appendChild(s);
 const T = {
   ca: {
     nav_inici:'Inici', nav_autor:'Autor', nav_trajectoria:'Trajectòria', nav_llibre:'El llibre', nav_continguts:'Continguts', nav_tecnologies:'Tecnologies', nav_contacte:'Contacte',
@@ -509,7 +551,7 @@ const T = {
     tl4_desc:'Els últims anys he pogut impartir el mòdul de Bases de dades als cicles de DAM i DAW, centrant-me especialment en MySQL, PostgreSQL, Oracle i MongoDB.',
     tl5_year:'Actualitat — Institut TIC de Barcelona', tl5_title:'Professor de Bases de Dades · Autor',
     tl5_desc:'Segueixo impartint el mòdul de Bases de dades però els últims mesos he pogut entrar en el projecte de creació del llibre <em>Bases de dades 360°: del disseny al NoSQL</em>.',
-    llibre_title:'Del disseny al NoSQL, sense deixar res pel camí', llibre_badge:'Pròximament',
+    llibre_title:'Del disseny al NoSQL, sense deixar res pel camí', llibre_badge:'Disponible', llibre_buy_btn:'Comprar a Bubok',
     llibre_desc1:'Un recurs complet que acompanya l\'alumne des dels fonaments del disseny de bases de dades fins a les tecnologies NoSQL actuals. Escrit des de l\'experiència real a l\'aula, amb exemples pràctics, exercicis progressius i una estructura pensada per als cicles formatius.',
     llibre_desc2:'Escrit amb la intenció que tots els alumnes puguin arribar fins al final amb confiança i amb ganes de més.',
     llibre_audience_label:'A qui va dirigit:', llibre_audience_text:'Alumnes de cicles formatius de grau superior d\'informàtica, estudiants autodidactes i docents que busquen un material estructurat i complet.',
@@ -553,7 +595,7 @@ const T = {
     tl4_desc:'En los últimos años he podido impartir el módulo de Bases de datos en los ciclos de DAM y DAW, centrándome especialmente en MySQL, PostgreSQL, Oracle y MongoDB.',
     tl5_year:'Actualidad — Institut TIC de Barcelona', tl5_title:'Profesor de Bases de Datos · Autor',
     tl5_desc:'Sigo impartiendo el módulo de Bases de datos, pero en los últimos meses me he embarcado en el proyecto de crear el libro <em>Bases de dades 360°: del disseny al NoSQL</em>.',
-    llibre_title:'Del diseño al NoSQL, sin dejar nada por el camino', llibre_badge:'Próximamente',
+    llibre_title:'Del diseño al NoSQL, sin dejar nada por el camino', llibre_badge:'Disponible', llibre_buy_btn:'Comprar en Bubok',
     llibre_desc1:'Un recurso completo que acompaña al alumno desde los fundamentos del diseño de bases de datos hasta las tecnologías NoSQL actuales. Escrito desde la experiencia real en el aula, con ejemplos prácticos, ejercicios progresivos y una estructura pensada para los ciclos formativos.',
     llibre_desc2:'Escrito con la intención de que todos los alumnos puedan llegar hasta el final con confianza y con ganas de más.',
     llibre_audience_label:'A quién va dirigido:', llibre_audience_text:'Alumnos de ciclos formativos de grado superior de informática, estudiantes autodidactas y docentes que buscan un material estructurado y completo.',
@@ -597,7 +639,7 @@ const T = {
     tl4_desc:'Over recent years I have focused on the Databases module in the DAM and DAW programmes, specialising in MySQL, PostgreSQL, Oracle and MongoDB.',
     tl5_year:'Present — Institut TIC de Barcelona', tl5_title:'Database Teacher · Author',
     tl5_desc:'I continue teaching the Databases module while, over the past months, I have embarked on the project of writing the book <em>Bases de dades 360°: del disseny al NoSQL</em>.',
-    llibre_title:'From design to NoSQL, leaving nothing behind', llibre_badge:'Coming soon',
+    llibre_title:'From design to NoSQL, leaving nothing behind', llibre_badge:'Available', llibre_buy_btn:'Buy on Bubok',
     llibre_desc1:'A comprehensive resource that guides students from the fundamentals of database design through to current NoSQL technologies. Written from real classroom experience, with practical examples, progressive exercises and a structure tailored for vocational training programmes.',
     llibre_desc2:'Written with the intention that every student can reach the end with confidence and wanting more.',
     llibre_audience_label:'Who it\'s for:', llibre_audience_text:'Students in upper vocational IT programmes, self-taught learners and teachers looking for well-structured, comprehensive material.',
