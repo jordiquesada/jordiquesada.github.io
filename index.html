@@ -101,11 +101,11 @@
   .repo-desc { font-size: 0.85rem; color: var(--text-muted); }
   .repo-link { font-family: var(--mono); font-size: 13px; color: var(--teal); text-decoration: none; white-space: nowrap; border: 1px solid rgba(14,165,233,0.3); border-radius: 4px; padding: 0.4rem 0.9rem; transition: background 0.2s; }
   .repo-link:hover { background: rgba(14,165,233,0.1); }
-  .book-card { margin-top: 3.5rem; background: var(--navy3); border: 1px solid var(--border-bright); border-radius: 8px; padding: 2.5rem; display: grid; grid-template-columns: auto 1fr; gap: 3rem; align-items: start; }
-  .book-cover { width: 180px; background: var(--navy4); border-radius: 4px; border: 1px solid var(--border-bright); display: flex; flex-direction: column; align-items: stretch; gap: 1rem; padding: 1rem; position: relative; overflow: visible; }
+  .book-card { margin-top: 3.5rem; background: var(--navy3); border: 1px solid var(--border-bright); border-radius: 8px; padding: 2.5rem; display: grid; grid-template-columns: minmax(220px, 280px) 1fr; gap: 2rem; align-items: start; }
+  .book-cover { width: 100%; max-width: 240px; background: var(--navy4); border-radius: 4px; border: 1px solid var(--border-bright); display: flex; flex-direction: column; align-items: stretch; gap: 1rem; padding: 1rem; position: relative; overflow: visible; }
   .book-cover::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(14,165,233,0.15) 0%, transparent 60%); pointer-events: none; }
-  .cover-image { width: 100%; height: 260px; border-radius: 4px; overflow: hidden; background: var(--navy3); }
-  .cover-image img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .cover-image { width: 100%; aspect-ratio: 3 / 4; border-radius: 4px; overflow: hidden; background: var(--navy3); }
+  .cover-image img { width: 100%; height: 100%; object-fit: contain; display: block; }
   .book-cover-tag { font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; color: var(--teal); text-transform: uppercase; z-index: 1; }
   .book-cover-title { font-family: var(--serif); font-size: 1.1rem; color: var(--text); text-align: center; line-height: 1.3; z-index: 1; }
   .book-cover-accent { width: 40px; height: 2px; background: var(--amber); z-index: 1; margin: 0.5rem 0; }
@@ -193,33 +193,67 @@
     .autor-photo-wrap { position: static; }
     .autor-photo { aspect-ratio: 1/1; max-width: 220px; margin: 0 auto; }
     .book-card { grid-template-columns: 1fr; }
-    .book-cover { width: 140px; margin: 0 auto; }
+    .book-cover { width: 100%; max-width: 240px; margin: 0 auto; }
     .autor-stats { grid-template-columns: repeat(3,1fr); }
   }
   .btn-cta {
-  display: inline-block;
-  padding: 14px 28px;
-  background-color: #1a73e8; /* Blau net i modern */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 18px;
+  background-color: #1a73e8;
   color: #ffffff;
   border-radius: 10px;
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
   text-decoration: none;
-  transition: background-color 0.2s ease, transform 0.1s ease;
+  transition: background-color 0.2s ease, transform 0.1s ease, border-color 0.2s ease, color 0.2s ease;
   position: relative;
   z-index: 2;
+  border: 1px solid transparent;
 }
 
-.book-cover .btn-cta {
-  display: block;
-  width: 100%;
-  text-align: center;
-  margin-top: 0.5rem;
+.book-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-top: 1.5rem;
+}
+
+.buy-option {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.9rem;
+  border: 1px solid var(--border-bright);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.02);
+  flex: 1 1 220px;
+}
+
+.buy-option-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
 }
 
 .btn-cta:hover {
   background-color: #1558b0;
   transform: translateY(-2px);
+}
+
+.btn-cta-secondary {
+  background: #1a73e8;
+  color: #ffffff;
+  border-color: transparent;
+}
+
+.btn-cta-secondary:hover {
+  background: #1558b0;
+  color: #ffffff;
+  border-color: transparent;
 }
 
 </style>
@@ -371,7 +405,6 @@
   <div class="book-card">
     <div class="book-cover">
       <div class="cover-image"><a href="https://www.bubok.es/libros/286477/bases-de-dades-360-del-disseny-al-nosql" target="_blank" rel="noopener noreferrer"><img src="./img/portada.png" alt="Portada — Bases de dades 360°"></a></div>
-      <a href="https://www.bubok.es/libros/286477/bases-de-dades-360-del-disseny-al-nosql" class="btn-cta" target="_blank" rel="noopener noreferrer">Comprar o descarregar</a>
     </div>
     <div class="book-info">
       <h3 class="book-title-display">Bases de dades 360°:<br><em>del disseny al NoSQL</em></h3>
@@ -381,6 +414,16 @@
       <div class="book-audience">
         <strong data-i18n="llibre_audience_label">A qui va dirigit:</strong>
         <span data-i18n="llibre_audience_text">Alumnes de cicles formatius de grau superior d'informatica, estudiants autodidactes i docents que busquen un material estructurat i complet.</span>
+      </div>
+      <div class="book-actions">
+        <div class="buy-option">
+          <div class="buy-option-label" data-i18n="llibre_purchase_label">Comprar en paper</div>
+          <a href="https://www.bubok.es/libros/286477/bases-de-dades-360-del-disseny-al-nosql" class="btn-cta" target="_blank" rel="noopener noreferrer" data-i18n="llibre_purchase_btn">Comprar a preu de cost</a>
+        </div>
+        <div class="buy-option">
+          <div class="buy-option-label" data-i18n="llibre_pdf_label">Descarregar en pdf</div>
+          <a href="https://www.bubok.es/libros/286477/bases-de-dades-360-del-disseny-al-nosql" class="btn-cta btn-cta-secondary" target="_blank" rel="noopener noreferrer" data-i18n="llibre_pdf_btn">Descàrrega gratuïta</a>
+        </div>
       </div>
     </div>
   </div>
@@ -552,6 +595,7 @@ const T = {
     tl5_year:'Actualitat — Institut TIC de Barcelona', tl5_title:'Professor de Bases de Dades · Autor',
     tl5_desc:'Segueixo impartint el mòdul de Bases de dades però els últims mesos he pogut entrar en el projecte de creació del llibre <em>Bases de dades 360°: del disseny al NoSQL</em>.',
     llibre_title:'Del disseny al NoSQL, sense deixar res pel camí', llibre_badge:'Disponible', llibre_buy_btn:'Comprar a Bubok',
+    llibre_purchase_label:'Comprar en paper', llibre_purchase_btn:'Comprar a preu de cost', llibre_pdf_label:'Descarregar en pdf', llibre_pdf_btn:'Descàrrega gratuïta',
     llibre_desc1:'Un recurs complet que acompanya l\'alumne des dels fonaments del disseny de bases de dades fins a les tecnologies NoSQL actuals. Escrit des de l\'experiència real a l\'aula, amb exemples pràctics, exercicis progressius i una estructura pensada per als cicles formatius.',
     llibre_desc2:'Escrit amb la intenció que tots els alumnes puguin arribar fins al final amb confiança i amb ganes de més.',
     llibre_audience_label:'A qui va dirigit:', llibre_audience_text:'Alumnes de cicles formatius de grau superior d\'informàtica, estudiants autodidactes i docents que busquen un material estructurat i complet.',
@@ -596,6 +640,7 @@ const T = {
     tl5_year:'Actualidad — Institut TIC de Barcelona', tl5_title:'Profesor de Bases de Datos · Autor',
     tl5_desc:'Sigo impartiendo el módulo de Bases de datos, pero en los últimos meses me he embarcado en el proyecto de crear el libro <em>Bases de dades 360°: del disseny al NoSQL</em>.',
     llibre_title:'Del diseño al NoSQL, sin dejar nada por el camino', llibre_badge:'Disponible', llibre_buy_btn:'Comprar en Bubok',
+    llibre_purchase_label:'Comprar en papel', llibre_purchase_btn:'Comprar a precio de coste', llibre_pdf_label:'Descargar en pdf', llibre_pdf_btn:'Descarga gratis',
     llibre_desc1:'Un recurso completo que acompaña al alumno desde los fundamentos del diseño de bases de datos hasta las tecnologías NoSQL actuales. Escrito desde la experiencia real en el aula, con ejemplos prácticos, ejercicios progresivos y una estructura pensada para los ciclos formativos.',
     llibre_desc2:'Escrito con la intención de que todos los alumnos puedan llegar hasta el final con confianza y con ganas de más.',
     llibre_audience_label:'A quién va dirigido:', llibre_audience_text:'Alumnos de ciclos formativos de grado superior de informática, estudiantes autodidactas y docentes que buscan un material estructurado y completo.',
@@ -640,6 +685,7 @@ const T = {
     tl5_year:'Present — Institut TIC de Barcelona', tl5_title:'Database Teacher · Author',
     tl5_desc:'I continue teaching the Databases module while, over the past months, I have embarked on the project of writing the book <em>Bases de dades 360°: del disseny al NoSQL</em>.',
     llibre_title:'From design to NoSQL, leaving nothing behind', llibre_badge:'Available', llibre_buy_btn:'Buy on Bubok',
+    llibre_purchase_label:'Buy a paper copy', llibre_purchase_btn:'Buy at cost price', llibre_pdf_label:'Download as PDF', llibre_pdf_btn:'Free download',
     llibre_desc1:'A comprehensive resource that guides students from the fundamentals of database design through to current NoSQL technologies. Written from real classroom experience, with practical examples, progressive exercises and a structure tailored for vocational training programmes.',
     llibre_desc2:'Written with the intention that every student can reach the end with confidence and wanting more.',
     llibre_audience_label:'Who it\'s for:', llibre_audience_text:'Students in upper vocational IT programmes, self-taught learners and teachers looking for well-structured, comprehensive material.',
